@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wengyu的专栏</title>
+    <style>
+        body {
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        .greeting {
+            font-size: 2em;
+            color: rgb(132, 35, 189);
+            margin: 20px 0;
+            text-align: center;
+        }
+        h1 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="color: rgb(132, 35, 189);">
+        Welcome!
+    </h1>
+    <div class="greeting" id="greeting" style="color:chocolate;"></div>
+    <h1>欢迎来到Wengyu的专栏网站！</h1>
+
+    <script>
+        function getGreetingAndBackground(hour) {
+            let greeting = '';
+            let bg = '';
+
+            if (hour >= 5 && hour < 12) {
+                greeting = "早上好";
+                bg = "background_morning.png";
+            } else if (hour >= 12 && hour < 14) {
+                greeting = "中午好";
+                bg = "background_noon.png";
+            } else if (hour >= 14 && hour < 18) {
+                greeting = "下午好";
+                bg = "background_afternoon.png";
+            } else if (hour >= 18 && hour < 22) {
+                greeting = "晚上好";
+                bg = "background_evening.png";
+            } else {
+                greeting = "还不睡？";
+                bg = "background_midnight.png";
+            }
+
+            return {greeting, bg};
+        }
+
+        const now = new Date();
+        const hour = now.getHours();
+        const {greeting, bg} = getGreetingAndBackground(hour);
+
+        document.getElementById('greeting').innerText = greeting;
+        document.body.style.backgroundImage = `url('${bg}')`;
+    </script>
+</body>
+</html>

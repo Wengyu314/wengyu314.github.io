@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>wengyu的专栏</title>
+    <!-- 引入 Auth0 SDK -->
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
     <style>
         body {
             background-size: cover;
@@ -39,9 +41,27 @@
         .intro-btn:hover {
             background-color: chocolate;
         }
+        .user-info {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 1.2em;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .auth-container {
+            text-align: center;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
+    <!-- 新增：用户登录信息显示区域 -->
+    <div class="user-info" id="user-info"></div>
+    <div class="auth-container">
+        <button id="login-btn" class="intro-btn" style="display: none;">登录！</button>
+        <button id="logout-btn" class="intro-btn" style="display: none; background-color: #ff4444;">退出登录</button>
+    </div>
+
     <h1 style="color: rgb(132, 35, 189);">
         Welcome!
     </h1>
@@ -50,19 +70,86 @@
     <h2 style="color:gold;">第一次来到这个网站？没事！</h2>
     <div class="intro-btn-container">
         <button style="color: black;" class="intro-btn" onclick="window.location.href='https://wengyu314.github.io/introduction'">
-            
-                👉来了解了解该网站👈
+            👉来了解了解该网站👈
         </button>
     </div>
     <h2 style="color:rgb(154, 148, 0);">或者说，你已经准备好进入这个网站了？</h2>
-    <div class="intro-btn-container" style="color:black">
-        <button class="intro-btn" onclick="window.location.href='https://login/'">
-            登录！
-        </button>
-    </div>
     
 
     <script>
+        // Auth0 配置和功能
+        let auth0Client = null;
+
+        // 配置 Auth0
+        const auth0Config = {
+            domain: "dev-2gmv2hhygxkgtbd.us.auth0.com", // 替换为您的 Domain
+            client_id: "GNV1GPP4KBT...", // 替换为您的 Client ID
+            authorizationParams: {
+                redirect_uri: window.location.origin
+            }
+        };
+
+        // 初始化 Auth0
+        async function initializeAuth0() {
+            try {
+                auth0Client = await createAuth0Client(auth0Config);
+                
+                // 检查是否是从 Auth0 重定向回来的
+                if (window.location.search.includes('code=')) {
+                    await auth0Client.handleRedirectCallback();
+                    // 清除URL中的认证参数
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+                
+                // 更新UI显示登录状态
+                await updateAuthUI();
+            } catch (error) {
+                console.error('Auth0初始化失败:', error);
+            }
+        }
+
+        // 更新认证UI
+        async function updateAuthUI() {
+            const isAuthenticated = await auth0Client.isAuthenticated();
+            const loginButton = document.getElementById('login-btn');
+            const logoutButton = document.getElementById('logout-btn');
+            const userInfoElement = document.getElementById('user-info');
+
+            if (isAuthenticated) {
+                // 用户已登录
+                loginButton.style.display = 'none';
+                logoutButton.style.display = 'block';
+                
+                // 获取并显示用户信息
+                const user = await auth0Client.getUser();
+                userInfoElement.innerHTML = `👋 欢迎，${user.name || user.email}!`;
+            } else {
+                // 用户未登录
+                loginButton.style.display = 'block';
+                logoutButton.style.display = 'none';
+                userInfoElement.innerHTML = '';
+            }
+        }
+
+        // 登录函数
+        async function login() {
+            await auth0Client.loginWithRedirect();
+        }
+
+        // 登出函数
+        function logout() {
+            auth0Client.logout({
+                returnTo: window.location.origin
+            });
+        }
+
+        // 为按钮绑定事件
+        document.getElementById('login-btn').addEventListener('click', login);
+        document.getElementById('logout-btn').addEventListener('click', logout);
+
+        // 页面加载时初始化Auth0
+        initializeAuth0();
+
         function getGreetingAndBackground(hour) {
             let greeting = '';
             let bg = '';

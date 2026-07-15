@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CapSMP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: black;
+        }
+
+        .top-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 400px;
+    z-index: 10;
+    background-image: url("background2.png"), linear-gradient(135deg, #c084fc, #7c3aed, #4c1d95);
+    background-size: cover, 100% 100%;
+    background-position: top center, center;
+    background-repeat: no-repeat, no-repeat;
+    transition: opacity 0.1s;
+    box-sizing: border-box;
+    border-bottom: 2px solid white;
+    pointer-events: none;   /* 关键：让点击穿透 */
+}
+
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: black;
+    border-bottom: 2px solid white;
+    z-index: 20;
+    opacity: 0;
+    transition: opacity 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    pointer-events: none;   /* 关键：让点击穿透 */
+}
+
+        .content {
+            margin-top: 400px;
+            padding: 40px 20px 600px;
+            text-align: center;
+            background-color: black;
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+        .content h1 {
+            font-family: 'Impact', serif;
+            font-size: 8em;
+            letter-spacing: 8px;
+        }
+        .content h2 {
+            font-size: 1.5em;
+            font-weight: normal;
+            margin-top: 20px;
+            line-height: 1.8;
+        }
+        .content p {
+            font-size: 1.2em;
+            margin: 30px auto;
+            max-width: 800px;
+            line-height: 2;
+        }
+        .hint {
+            color: #aaa;
+            font-style: italic;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-banner"></div>
+    <div class="top-bar">CapSMP</div>
+
+    <div class="content">
+        <h1>C a p S M P</h1>
+        <h2>一个由Wengyu_314、zaijian_123、sunset_1228、SpectFox一同创作的Minecraft剧本服务器</h2>
+        <p style="color: red;">[Wengyu_314]这里是...什么地方...?</p>
+        <p style="color: #00ffe1">[zaijian_123]我也不知道...</p>
+        <!-- 在这里添加视频(超链接) -->
+        <div style="margin: 40px auto; max-width: 800px;">
+            <iframe 
+                src="https://player.bilibili.com/player.html?bvid=BV1cXMM6EE2V&page=1&danmaku=0&autoplay=1&high_quality=1&t=866" 
+                scrolling="no" 
+                border="0" 
+                frameborder="no" 
+                framespacing="0" 
+                allowfullscreen="true" 
+                width="100%" 
+                height="450">
+        </iframe>
+        </div>
+        <p style="color: blue;">[sunset_1228]大家、你们...都是从单人存档进来的...?</p>
+        <p style="color:bisque">[SpectFox]这里根本出不去...!</p>
+        <p class="hint">这里不是现实...这是一场...梦?</p>
+        <p>主演们如下：</p>
+<p>
+    <a href="https://space.bilibili.com/3546907309771359" target="_blank" style="color: #ff0000; text-decoration: none;">@Wengyu_314</a>
+    主持整个剧情策划
+    同时也是整个剧本服务器的创作者、服务器持有者
+    最为重要的主演角色<p style="color: greenyellow">(↑会发布个人视角)</p>
+</p>
+
+<p>
+    <a href="https://space.bilibili.com/3546976048122156" target="_blank" style="color: #00ffb3; text-decoration: none;">@zaijian_123</a>
+    次主演角色<p style="color: red">(↑不会发布个人视角)</p>
+</p>
+
+<p>
+    <a href="https://space.bilibili.com/3546613567982387" target="_blank" style="color: #0026ff; text-decoration: none;">@sunset_1228</a>
+    第二重要的主演角色<p style="color: greenyellow">(↑会发布个人视角)</p>
+</p>
+
+<p>
+    <a href="https://space.bilibili.com/3546648156309975" target="_blank" style="color: #ffdce1; text-decoration: none;">@SpectFox</a>
+    第三重要的主演角色<p style="color: greenyellow">(↑会发布个人视角)</p>
+</p>
+    </div>
+
+    <script>
+        const banner = document.querySelector('.top-banner');
+        const topBar = document.querySelector('.top-bar');
+        const fadeDistance = 300;   // 滚动多少px后紫框完全消失
+
+        let isAnimating = false;
+
+        function updateOpacity(scrollY) {
+            let progress = scrollY / fadeDistance;
+            if (progress < 0) progress = 0;
+            if (progress > 1) progress = 1;
+            banner.style.opacity = 1 - progress;
+            topBar.style.opacity = progress;
+        }
+
+        window.addEventListener('scroll', function() {
+            const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+            updateOpacity(scrollY);
+        });
+
+        // ----- 滚轮吸附（淡化阶段内任意位置触发） -----
+        window.addEventListener('wheel', function(e) {
+            if (isAnimating) return;
+
+            const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+            const delta = e.deltaY;
+
+            // 只在淡化阶段内（0 ~ fadeDistance）触发
+            if (scrollY >= 0 && scrollY <= fadeDistance) {
+                e.preventDefault();
+                isAnimating = true;
+                let target;
+                if (delta > 0) {
+                    target = fadeDistance;   // 向下 → 滑到底
+                } else if (delta < 0) {
+                    target = 0;              // 向上 → 滑到顶
+                } else {
+                    return;
+                }
+                window.scrollTo({ top: target, behavior: 'smooth' });
+                setTimeout(() => {
+                    isAnimating = false;
+                }, 500);
+            }
+        }, { passive: false });
+
+        // 初始化
+        updateOpacity(window.scrollY || 0);
+    </script>
+</body>
+</html>
